@@ -1,0 +1,16 @@
+{
+  "name": "beaconbone",
+  "version": "1.0.0",
+  "description": "An indoor positioning system",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.ncsu.edu:vtduong/BeaconBone.git"
+  },
+  "author": "Van Duong, Max Johnson, Matthew Hill",
+  "license": "ISC"
+}
+
