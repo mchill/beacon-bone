@@ -4,7 +4,7 @@
   "description": "An indoor positioning system",
   "scripts": {
     "setup": "./setup.sh",
-    "publisher": "sudo node_modules/coffee-script/bin/coffee beaconbone.coffee",
+    "publisher": "sudo node_modules/coffee-script/bin/coffee src/beaconbone.coffee",
     "subscriber": "echo \"Error: not implemented\" && exit 1",
     "server": "echo \"Error: not implemented\" && exit 1",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -4,7 +4,6 @@
 
 1. `git clone git@github.ncsu.edu:vtduong/BeaconBone.git`
 2. `npm run setup`
-3. `npm install`
 
 ## Run
 
@@ -19,4 +18,3 @@
 ### MQTT Server
 
 `npm run server`
-
