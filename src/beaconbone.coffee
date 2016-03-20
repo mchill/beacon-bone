@@ -5,29 +5,43 @@ Beacon = require('./Beacon.coffee').Beacon
 # Begin with an empty list of active beacons
 beacons = {}
 
-# Scan for beacons
-NodeBeacon.startScanning()
+# Scan for beacons with the UUID 0
+NodeBeacon.startScanning('00000000000000000000000000000000')
+
+# Purge old distances every half second
+setInterval ->
+    # Remove distances older than one second
+    time = new Date().getTime() - 1000
+
+    # Iterate through beacons
+    for index, beacon of beacons
+        # Purge the beacon's distances
+        beacon.purgeDistances(time)
+
+        # If the beacon no longer has any registered distances
+        if !beacon.isActive()
+            # Remove the beacon from the list
+            delete beacons[index]
+, 500
 
 # Called when a beacon is detected
 NodeBeacon.on('discover', (data) ->
-    # Get the UUID of the beacon as a hex integer
-    uuid = parseInt(data.uuid, 16)
+    # Capture the time at which the beacon is discovered
+    time = new Date().getTime()
 
-    # Beacons specific to the BeaconBone project have a UUID of 0
-    if uuid is 0
-        # Beacons are indexed in the associative array as their major,minor
-        index = data.major + ',' + data.minor
-        beacon = beacons[index]
+    # Beacons are indexed in the associative array as their major,minor
+    index = data.major + ',' + data.minor
+    beacon = beacons[index]
 
-        # If the beacon was not already active
-        if !beacon?
-            # Create it and add it to the list
-            beacon = new Beacon(data.major, data.minor, data.measuredPower)
-            beacons[index] = beacon
+    # If the beacon was not already active
+    if !beacon?
+        # Create it and add it to the list
+        beacon = new Beacon(data.major, data.minor, data.measuredPower)
+        beacons[index] = beacon
 
-        # Add the newest distance
-        beacon.addDistance(data.rssi)
+    # Add the newest distance
+    beacon.addDistance(data.rssi, time)
 
-        # Print the average distance
-        console.log(beacon.getDistance())
+    # Print the average distance
+    console.log(beacon.getDistance())
 )
