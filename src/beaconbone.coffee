@@ -1,15 +1,29 @@
-# Require the bleacon library and Beacon class
+# External requirements
 NodeBeacon = require('bleacon')
 Beacon = require('./Beacon.coffee').Beacon
+mqtt = require('mqtt')
 
 # Begin with an empty list of active beacons
 beacons = {}
+
+# Get server IP from command-line argument
+ip = process.argv[2]
+if !ip?
+    throw new Error('Usage: npm run publisher -- serverIP')
+
+# Connect to server
+client = mqtt.connect(ip)
+
+# Publish to the server every half second
+setInterval( ->
+    client.publish('beaconbone', 'Hello mqtt')
+, 500)
 
 # Scan for beacons with the UUID 0
 NodeBeacon.startScanning('00000000000000000000000000000000')
 
 # Purge old distances every half second
-setInterval ->
+setInterval( ->
     # Remove distances older than one second
     time = new Date().getTime() - 1000
 
@@ -22,7 +36,7 @@ setInterval ->
         if !beacon.isActive()
             # Remove the beacon from the list
             delete beacons[index]
-, 500
+, 500)
 
 # Called when a beacon is detected
 NodeBeacon.on('discover', (data) ->

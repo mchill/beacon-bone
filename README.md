@@ -9,12 +9,12 @@
 
 ### Publishing
 
-`npm run publisher`
+`npm run publisher -- serverID`
 
 ### Subscribing
 
-`npm run subscriber`
+`npm run subscriber -- serverID`
 
-### MQTT Server
+### MQTT Broker
 
-`npm run server`
+`npm run broker`
