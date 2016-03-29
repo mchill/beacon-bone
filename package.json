@@ -18,6 +18,7 @@
   "dependencies": {
     "bleacon": "^0.4.0",
     "coffee-script": "^1.10.0",
+    "express": "^4.13.4",
     "mosca": "^1.1.2",
     "mqtt": "^1.7.4"
   }
