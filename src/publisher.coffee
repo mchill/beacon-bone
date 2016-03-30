@@ -1,4 +1,3 @@
-# External requirements
 NodeBeacon = require('bleacon')
 Beacon = require('./Beacon.coffee').Beacon
 mqtt = require('mqtt')
@@ -9,7 +8,7 @@ beacons = {}
 # Get server IP from command-line argument
 ip = process.argv[2]
 if !ip?
-    throw new Error('Usage: npm run publisher -- serverIP')
+    throw new Error('Usage: npm run-script publisher serverIP')
 
 # Connect to server
 client = mqtt.connect(ip)

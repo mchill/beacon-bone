@@ -35,6 +35,7 @@ class exports.Beacon
         distances[time] = Math.pow(10, (@measuredPower - rssi) / 20)
 
     # Removes old distances from the list of distances.
+    # Since the list is ordered, stop once a valid time is found
     #
     # time
     #     the lower time limit allowed
@@ -44,8 +45,6 @@ class exports.Beacon
             if milliseconds < time
                 delete distances[milliseconds]
                 continue
-
-            # Since the list is ordered, stop once a valid time is found
             break
 
     # Indicates whether any distances are registered with this beacon
@@ -55,5 +54,4 @@ class exports.Beacon
     isActive: ->
         if Object.keys(distances).length is 0
             return false
-
         return true

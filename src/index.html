@@ -1,0 +1,19 @@
+<!doctype html>  
+<html lang="en">  
+    <title>BeaconBone Map</title>
+
+    <body>
+        <img id="map" src="" />
+
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="/socket.io/socket.io.js"></script>   
+
+        <script>
+            var socket = io.connect();
+
+            socket.on('messages', function(data) {
+                $("#map").attr("src", data);
+            });
+        </script>
+    </body>
+</html>  
