@@ -3,18 +3,19 @@
 ## Install
 
 1. `git clone git@github.ncsu.edu:vtduong/BeaconBone.git`
-2. `npm run setup`
+2. `npm run-script setup`
+3. `npm install`
 
 ## Run
 
 ### Publishing
 
-`npm run publisher -- serverID`
+`npm run-script publisher serverID`
 
 ### Subscribing
 
-`npm run subscriber -- serverID`
+`npm run-script subscriber serverID`
 
 ### MQTT Broker
 
-`npm run broker`
+`npm run-script broker`

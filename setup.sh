@@ -23,6 +23,5 @@ sudo apt-get -y install build-essential nodejs
 # Install noble dependencies
 sudo apt-get -y install bluetooth bluez libbluetooth-dev libudev-dev
 
-# Install npm package
-npm install
-
+# Install Cairo dependencies
+sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev
