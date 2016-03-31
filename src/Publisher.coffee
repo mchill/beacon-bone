@@ -43,8 +43,8 @@ class exports.Publisher
     # the BBBK's MAC address.
     #
     publish: =>
-        if x? and y?
-            @client.publish('position/' + @macAddress, x + ',' + y)
+        if @x? and @y?
+            @client.publish('position/' + @macAddress, @x + ',' + @y)
 
     # Add the beacon to the list of beacons if it does not already exist.
     # Then adds the latest distance to the beacon.

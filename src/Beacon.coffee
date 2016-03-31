@@ -43,13 +43,13 @@ class exports.Beacon
     #
     addDistance: (rssi, time) =>
         @distances[time] = Math.pow(10, (@measuredPower - rssi) / 20)
-        console.log(@getDistance())
 
     # Calculates the average distance from the detecting system.
     #
     calcAvgDistance: =>
         distanceList = (distance for time, distance of @distances)
-        @avgDistance = distanceList.reduce((first, second) -> first + second) / distanceList.length
+        if distanceList.length != 0
+            @avgDistance = distanceList.reduce((first, second) -> first + second) / distanceList.length
 
     # Removes old distances from the list of distances.
     # Since the list is ordered, stop once a valid time is found.

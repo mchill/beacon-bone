@@ -33,7 +33,7 @@ class exports.Server
             console.log 'Success: server started'
 
         @client.on 'connect', =>
-            client.subscribe '/position/#'
+            @client.subscribe 'position/#'
 
         @client.on 'message', @processMessage
 
@@ -54,3 +54,4 @@ class exports.Server
     #
     processMessage: (topic, message) =>
         # TODO: process topics to draw objects on the canvas
+        console.log message.toString()
