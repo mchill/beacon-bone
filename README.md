@@ -11,7 +11,7 @@
 
 ### Publishing
 
-`coffee publisher.coffee brokerIP`
+`sudo coffee publisher.coffee brokerIP`
 
 ### MQTT Broker
 
@@ -19,4 +19,4 @@
 
 ### HTTP Server
 
-`coffee server.coffee brokerIP`
+`sudo coffee server.coffee brokerIP`

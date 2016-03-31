@@ -13,16 +13,26 @@ class exports.Beacon
     #
     constructor: (@x, @y, @measuredPower) ->
         @distances = {}
+        setInterval(@calcAvgDistance, 500)
         setInterval(@purgeDistances, 500)
 
-    # Gets the average distance from the detecting system over a set
-    # period of time.
+    # Return the x position of the beacon.
     #
-    # returns the average distance over the some period of time
+    getX: =>
+        return @x
+
+    # Return the y position of the beacon.
     #
-    getDistance: ->
-        distanceList = (distance for time, distance of @distances)
-        return distanceList.reduce((first, second) -> first + second) / distanceList.length
+    getY: =>
+        return @y
+
+    # Returns the average distance away over time.
+    #
+    getDistance: =>
+        if !avgDistance?
+            @calcAvgDistance()
+
+        return @avgDistance
 
     # Calculate and add a distance to the list of distances.
     #
@@ -31,9 +41,15 @@ class exports.Beacon
     # time
     #     the time when the beacon was discovered
     #
-    addDistance: (rssi, time) ->
+    addDistance: (rssi, time) =>
         @distances[time] = Math.pow(10, (@measuredPower - rssi) / 20)
         console.log(@getDistance())
+
+    # Calculates the average distance from the detecting system.
+    #
+    calcAvgDistance: =>
+        distanceList = (distance for time, distance of @distances)
+        @avgDistance = distanceList.reduce((first, second) -> first + second) / distanceList.length
 
     # Removes old distances from the list of distances.
     # Since the list is ordered, stop once a valid time is found.
@@ -51,7 +67,7 @@ class exports.Beacon
     #
     # return true if at least one distance, false if none
     #
-    isActive: ->
+    isActive: =>
         if Object.keys(@distances).length is 0
             return false
         return true
