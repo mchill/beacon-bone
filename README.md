@@ -3,19 +3,20 @@
 ## Install
 
 1. `git clone git@github.ncsu.edu:vtduong/BeaconBone.git`
-2. `npm run-script setup`
-3. `npm install`
+2. `cd BeaconBone`
+3. `./setup.sh`
+4. `npm install`
 
 ## Run
 
 ### Publishing
 
-`npm run-script publisher serverID`
-
-### Subscribing
-
-`npm run-script subscriber serverID`
+`coffee publisher.coffee brokerIP`
 
 ### MQTT Broker
 
-`npm run-script broker`
+`mosca -v | bunyan`
+
+### HTTP Server
+
+`coffee server.coffee brokerIP`
