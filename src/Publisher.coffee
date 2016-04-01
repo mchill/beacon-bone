@@ -1,7 +1,8 @@
+winston = require('winston')
 NodeBeacon = require('bleacon')
-Beacon = require('./Beacon.coffee').Beacon
 mqtt = require('mqtt')
 getmac = require('getmac')
+Beacon = require('./Beacon.coffee').Beacon
 
 # Handles publishing position to the MQTT server.
 #
@@ -18,25 +19,32 @@ class exports.Publisher
         @x = null
         @y = null
 
+        winston.verbose("Connecting to the MQTT broker at #{brokerIP}")
         @client = mqtt.connect(brokerIP)
 
-        getmac.getMac (err, macAddress) =>
+        getmac.getMac((err, macAddress) =>
             if err?
-                console.error 'Error: MAC Address cannot be read'
+                winston.error('MAC address cannot be read')
                 process.exit 1
+
+            winston.info("MAC address recorded: #{macAddress}")
             @macAddress = macAddress
+        )
 
         NodeBeacon.on('discover', @registerBeacon)
 
     # Begin scanning for beacons and publishing to the broker.
     #
     start: =>
-        @client.on 'connect', =>
+        @client.on('connect', =>
+            winston.info("Connected to the MQTT broker at #{brokerIP}")
             setInterval(@publish, 500)
+        )
 
         setInterval(@purgeBeacons, 500)
         setInterval(@getPosition, 500)
 
+        winston.info('Start scanning for beacons')
         NodeBeacon.startScanning('00000000000000000000000000000000')
 
     # Publish the user's position to the MQTT server under
@@ -44,7 +52,8 @@ class exports.Publisher
     #
     publish: =>
         if @x? and @y?
-            @client.publish('position/' + @macAddress, @x + ',' + @y)
+            winston.verbose("Publishing position: #{x},#{y}")
+            @client.publish("position/#{@macAddress}", "#{@x},#{@y}")
 
     # Add the beacon to the list of beacons if it does not already exist.
     # Then adds the latest distance to the beacon.
@@ -59,6 +68,7 @@ class exports.Publisher
         beacon = @beacons[index]
 
         if !beacon?
+            winston.info("New beacon #{index} discovered")
             beacon = new Beacon(data.major, data.minor, data.measuredPower)
             @beacons[index] = beacon
 
@@ -70,6 +80,7 @@ class exports.Publisher
     purgeBeacons: =>
         for index, beacon of @beacons
             if !beacon.isActive()
+                winston.info("Beacon #{index} no longer in range")
                 delete @beacons[index]
 
     # Find the position of the user in the map using the calculated

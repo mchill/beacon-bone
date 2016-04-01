@@ -9,7 +9,7 @@
 
 ## Run
 
-### Publishing
+### Publisher
 
 `sudo coffee publisher.coffee brokerIP`
 

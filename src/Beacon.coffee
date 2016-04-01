@@ -1,3 +1,5 @@
+winston = require('winston')
+
 # Represents a beacon in the environment.
 #
 class exports.Beacon
@@ -29,8 +31,11 @@ class exports.Beacon
     # Returns the average distance away over time.
     #
     getDistance: =>
-        if !avgDistance?
+        if !@avgDistance?
             @calcAvgDistance()
+        if !@avgDistance?
+            winston.error("Average distance requested for inactive beacon #{@x},#{@y}")
+            process.exit 1
 
         return @avgDistance
 
@@ -42,7 +47,9 @@ class exports.Beacon
     #     the time when the beacon was discovered
     #
     addDistance: (rssi, time) =>
-        @distances[time] = Math.pow(10, (@measuredPower - rssi) / 20)
+        distance = Math.pow(10, (@measuredPower - rssi) / 20)
+        @distances[time] = distance
+        winston.verbose("Distance #{distance} added to beacon #{@x},#{@y}")
 
     # Calculates the average distance from the detecting system.
     #

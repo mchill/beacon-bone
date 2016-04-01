@@ -1,3 +1,4 @@
+winston = require('winston')
 app = require('express')()
 server = require('http').createServer(app)
 io = require('socket.io')(server)
@@ -16,30 +17,38 @@ class exports.Server
     #         the IP address of the MQTT broker
     #
     constructor: (brokerIP) ->
+        winston.verbose("Connecting to the MQTT broker at #{brokerIP}")
         @client = mqtt.connect(brokerIP)
 
         @canvas = new Canvas(200, 200)
         @context = @canvas.getContext('2d')
 
-        app.get '/', (req, res) ->
+        app.get('/', (req, res) =>
+            winston.verbose('Serving index.html to a client')
             res.sendFile(__dirname + '/index.html')
+        )
 
     # Start listening over port 80 on the HTTP server.
     # Subscribe to all positions on the broker and declare what
     # to do on MQTT messages. Set timing for redrawing the map.
     #
     start: =>
-        server.listen 80, ->
-            console.log 'Success: server started'
+        server.listen(80, =>
+            winston.info('HTTP server started')
+        )
 
-        @client.on 'connect', =>
-            @client.subscribe 'position/#'
+        @client.on('connect', =>
+            winston.info("Connected to the MQTT broker at #{brokerIP}")
+            @client.subscribe('position/#')
+        )
 
-        @client.on 'message', @processMessage
+        @client.on('message', @processMessage)
 
-        io.on 'connection', (socket) =>
+        io.on('connection', (socket) =>
+            winston.info('Connected to a client over a socket')
             @socket = socket
             setInterval(@drawMap, 500)
+        )
 
     # Draws the map based on current data and sends it using the socket.
     #
@@ -48,10 +57,11 @@ class exports.Server
 
         # TODO: draw map
 
+        winston.verbose('Sending image to client')
         @socket.emit('messages', @canvas.toDataURL())
 
     # Process an MQTT message.
     #
     processMessage: (topic, message) =>
         # TODO: process topics to draw objects on the canvas
-        console.log message.toString()
+        winston.verbose("MQTT message from topic #{topic}: " + message.toString())
