@@ -1,4 +1,5 @@
 winston = require('winston')
+express = require('express')
 app = require('express')()
 server = require('http').createServer(app)
 io = require('socket.io')(server)
@@ -25,7 +26,7 @@ class exports.Server
 
         app.get('/', (req, res) =>
             winston.verbose('Serving index.html to a client')
-            res.sendFile(__dirname + '/index.html')
+            res.sendFile('public/index.html', {'root': "#{__dirname}/../"})
         )
 
     # Start listening over port 80 on the HTTP server.
