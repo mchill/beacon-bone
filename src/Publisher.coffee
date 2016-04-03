@@ -14,13 +14,13 @@ class exports.Publisher
     # brokerIP
     #         the IP address of the MQTT broker
     #
-    constructor: (brokerIP) ->
+    constructor: (@brokerIP) ->
         @beacons = {}
         @x = null
         @y = null
 
-        winston.verbose("Connecting to the MQTT broker at #{brokerIP}")
-        @client = mqtt.connect(brokerIP)
+        winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
+        @client = mqtt.connect(@brokerIP)
 
         getmac.getMac((err, macAddress) =>
             if err?
@@ -37,7 +37,7 @@ class exports.Publisher
     #
     start: =>
         @client.on('connect', =>
-            winston.info("Connected to the MQTT broker at #{brokerIP}")
+            winston.info("Connected to the MQTT broker at #{@brokerIP}")
             setInterval(@publish, 500)
         )
 
@@ -52,7 +52,7 @@ class exports.Publisher
     #
     publish: =>
         if @x? and @y?
-            winston.verbose("Publishing position: #{x},#{y}")
+            winston.verbose("Publishing position: #{@x},#{@y}")
             @client.publish("position/#{@macAddress}", "#{@x},#{@y}")
 
     # Add the beacon to the list of beacons if it does not already exist.

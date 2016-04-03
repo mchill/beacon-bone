@@ -17,9 +17,9 @@ class exports.Server
     # brokerIP
     #         the IP address of the MQTT broker
     #
-    constructor: (brokerIP) ->
-        winston.verbose("Connecting to the MQTT broker at #{brokerIP}")
-        @client = mqtt.connect(brokerIP)
+    constructor: (@brokerIP) ->
+        winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
+        @client = mqtt.connect(@brokerIP)
 
         @canvas = new Canvas(200, 200)
         @context = @canvas.getContext('2d')
@@ -39,7 +39,7 @@ class exports.Server
         )
 
         @client.on('connect', =>
-            winston.info("Connected to the MQTT broker at #{brokerIP}")
+            winston.info("Connected to the MQTT broker at #{@brokerIP}")
             @client.subscribe('position/#')
         )
 

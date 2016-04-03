@@ -47,7 +47,7 @@ class exports.Beacon
     #     the time when the beacon was discovered
     #
     addDistance: (rssi, time) =>
-        distance = Math.pow(10, (@measuredPower - rssi) / 20)
+        distance = 0.7 * Math.pow(rssi * 1.0 / @measuredPower, 6) + 0.3
         @distances[time] = distance
         winston.verbose("Distance #{distance} added to beacon #{@x},#{@y}")
 
@@ -56,7 +56,9 @@ class exports.Beacon
     calcAvgDistance: =>
         distanceList = (distance for time, distance of @distances)
         if distanceList.length != 0
-            @avgDistance = distanceList.reduce((first, second) -> first + second) / distanceList.length
+            distance = distanceList.reduce((first, second) -> first + second) / distanceList.length
+            @avgDistance = distance
+            winston.verbose("Average distance #{distance} calculated for beacon #{@x},#{@y}")
 
     # Removes old distances from the list of distances.
     # Since the list is ordered, stop once a valid time is found.
@@ -65,7 +67,7 @@ class exports.Beacon
         time = new Date().getTime()
 
         for milliseconds, distance of @distances
-            if milliseconds < time - 1000
+            if milliseconds < time - 2000
                 delete @distances[milliseconds]
                 continue
             break
