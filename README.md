@@ -1,5 +1,7 @@
 # BeaconBone
 
+[Developer Documentation](docs/documentation.md)
+
 ## Install
 
 1. `git clone git@github.ncsu.edu:vtduong/BeaconBone.git`

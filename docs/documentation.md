@@ -1,4 +1,4 @@
- # Documentation
+# Documentation
 
 ## Map
 
@@ -30,11 +30,13 @@ Key:
 ## Location Calculation
 
 1. If no active beacons, assume distance is unchanged since last calculation
-1. If one active beacon, location equals the location of that beacon
-2. If two or more active beacons:
+2. If one active beacon, location equals the location of that beacon
+3. If two or more active beacons:
     a. Find the two beacons with the strongest rssi
     b. Assume the user is on a line connecting the two beacons
-    c Determine the point on that line using the proportion of the two rssi's
+    c. Determine the point on that line using the proportion of the two rssi's
+    d. If that point is in inaccessible space
+        i. Use the position of the beacon with the strongest rssi
 
 ## Graph Construction
 
@@ -48,3 +50,14 @@ Key:
 2. Determine the target node
 3. Pass that information to an Dijkstra's algorithm
 4. Return an ordered list of nodes that the user must traverse to reach the target
+
+## High-level Process
+
+1. An MQTT server is setup on a BeagleBone
+2. Other BeagleBones detect beacons and calculate distances and their own location
+3. Those BeagleBones publish their positions to the MQTT broker
+3. An HTTP server subscribes to all positions published on the MQTT broker
+4. The server updates a map image regularly to show BeagleBone locations
+    * To highlight your location, add the parameter bbbk=id (each BBBK is given an ID)
+    * To show a path to another BBBK, add the parameters bbbk=id and target=id
+    * If the target id is prefixed with "node", a path to a node instead of a bbbk will be found
