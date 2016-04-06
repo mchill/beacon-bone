@@ -32,11 +32,11 @@ Key:
 1. If no active beacons, assume distance is unchanged since last calculation
 2. If one active beacon, location equals the location of that beacon
 3. If two or more active beacons:
-    a. Find the two beacons with the strongest rssi
-    b. Assume the user is on a line connecting the two beacons
-    c. Determine the point on that line using the proportion of the two rssi's
-    d. If that point is in inaccessible space
-        i. Use the position of the beacon with the strongest rssi
+    1. Find the two beacons with the strongest rssi
+    2. Assume the user is on a line connecting the two beacons
+    3. Determine the point on that line using the proportion of the two rssi's
+    4. If that point is in inaccessible space
+        * Use the position of the beacon with the strongest rssi
 
 ## Graph Construction
 
