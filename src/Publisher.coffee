@@ -2,6 +2,7 @@ winston = require('winston')
 NodeBeacon = require('bleacon')
 mqtt = require('mqtt')
 getmac = require('getmac')
+Vector = require('victor')
 Beacon = require('./Beacon.coffee').Beacon
 
 # Handles publishing position to the MQTT server.
@@ -16,8 +17,7 @@ class exports.Publisher
     #
     constructor: (@brokerIP) ->
         @beacons = {}
-        @x = null
-        @y = null
+        @position = null
 
         winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
         @client = mqtt.connect(@brokerIP)
@@ -51,9 +51,9 @@ class exports.Publisher
     # the BBBK's MAC address.
     #
     publish: =>
-        if @x? and @y?
-            winston.verbose("Publishing position: #{@x},#{@y}")
-            @client.publish("position/#{@macAddress}", "#{@x},#{@y}")
+        if @position?
+            winston.verbose("Publishing position: #{@position.x},#{@position.y}")
+            @client.publish("position/#{@macAddress}", "#{@position.x},#{@position.y}")
 
     # Add the beacon to the list of beacons if it does not already exist.
     # Then adds the latest distance to the beacon.
@@ -65,11 +65,12 @@ class exports.Publisher
         time = new Date().getTime()
 
         index = data.major + ',' + data.minor
+        position = new Vector(data.major, data.minor)
         beacon = @beacons[index]
 
         if !beacon?
             winston.info("New beacon #{index} discovered")
-            beacon = new Beacon(data.major, data.minor, data.measuredPower)
+            beacon = new Beacon(position, data.measuredPower)
             @beacons[index] = beacon
 
         beacon.addDistance(data.rssi, time)
@@ -107,14 +108,16 @@ class exports.Publisher
                     second = beacon
 
         if first? and second?
-            diffX = second.getX() - first.getX()
-            diffY = second.getY() - first.getY()
+            diffX = second.getPosition().x - first.getPosition().x
+            diffY = second.getPosition().y - first.getPosition().y
 
             proportion = first.getDistance() / (first.getDistance() + second.getDistance())
 
-            @x = first.getX() + proportion * diffX
-            @y = first.getY() + proportion * diffY
+            @position = new Vector(first.getPosition().x + proportion * diffX,
+                first.getPosition().y + proportion * diffY)
 
         else if first?
-            @x = first.getX()
-            @y = first.getY()
+            @position = first.getPosition().clone()
+
+        else
+            @position = null

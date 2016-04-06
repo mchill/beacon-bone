@@ -1,4 +1,5 @@
 winston = require('winston')
+Vector = require('victor')
 
 # Represents a beacon in the environment.
 #
@@ -13,20 +14,16 @@ class exports.Beacon
     # measuredPower
     #              the advertised RSSI at a distance of 1 meter
     #
-    constructor: (@x, @y, @measuredPower) ->
+    constructor: (@position, @measuredPower) ->
         @distances = {}
+        @id = "#{@position.x},#{@position.y}"
         setInterval(@calcAvgDistance, 500)
         setInterval(@purgeDistances, 500)
 
-    # Return the x position of the beacon.
+    # Return the position of the beacon.
     #
-    getX: =>
-        return @x
-
-    # Return the y position of the beacon.
-    #
-    getY: =>
-        return @y
+    getPosition: =>
+        return @position
 
     # Returns the average distance away over time.
     #
@@ -34,7 +31,7 @@ class exports.Beacon
         if !@avgDistance?
             @calcAvgDistance()
         if !@avgDistance?
-            winston.error("Average distance requested for inactive beacon #{@x},#{@y}")
+            winston.error("Average distance requested for inactive beacon #{@id}")
             process.exit 1
 
         return @avgDistance
@@ -49,7 +46,7 @@ class exports.Beacon
     addDistance: (rssi, time) =>
         distance = 0.7 * Math.pow(rssi * 1.0 / @measuredPower, 6) + 0.3
         @distances[time] = distance
-        winston.verbose("Distance #{distance} added to beacon #{@x},#{@y}")
+        winston.verbose("Distance #{distance} added to beacon #{@id}")
 
     # Calculates the average distance from the detecting system.
     #
@@ -58,7 +55,7 @@ class exports.Beacon
         if distanceList.length != 0
             distance = distanceList.reduce((first, second) -> first + second) / distanceList.length
             @avgDistance = distance
-            winston.verbose("Average distance #{distance} calculated for beacon #{@x},#{@y}")
+            winston.verbose("Average distance #{distance} calculated for beacon #{@id}")
 
     # Removes old distances from the list of distances.
     # Since the list is ordered, stop once a valid time is found.

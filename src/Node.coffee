@@ -3,12 +3,10 @@ Vector = require('victor')
 # Represents a node in the path of the indoor environment.
 #
 class exports.Node
-    constructor: (x, y) ->
+    constructor: (@position) ->
         @edges = {}
         @lastTraversed = null
         @csf = 0
-
-        @position = new Vector(x, y)
 
     getPosition: =>
         return @position

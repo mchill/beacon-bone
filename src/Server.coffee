@@ -5,6 +5,8 @@ server = require('http').createServer(app)
 io = require('socket.io')(server)
 Canvas = require('canvas')
 mqtt = require('mqtt')
+Vector = require('victor')
+TrackedItem = require('./TrackedItem.coffee').TrackedItem
 
 # Streams a continuously updated image of the map of the indoor
 # environment and the publishing objects within it to clients
@@ -18,6 +20,8 @@ class exports.Server
     #         the IP address of the MQTT broker
     #
     constructor: (@brokerIP) ->
+        @trackedItems = {}
+
         winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
         @client = mqtt.connect(@brokerIP)
 
@@ -51,6 +55,18 @@ class exports.Server
             setInterval(@drawMap, 500)
         )
 
+        setInterval(@purgeTrackedItems, 500)
+
+    # Removed tracked items that have not published a position recently.
+    #
+    purgeTrackedItems: =>
+        time = new Date().getTime()
+
+        for index, trackedItem of @trackedItems
+            if trackedItem.lastPublished() < time - 2000
+                winston.info("Item #{index} no longer being tracked")
+                delete @trackedItems[index]
+
     # Draws the map based on current data and sends it using the socket.
     #
     drawMap: =>
@@ -61,8 +77,26 @@ class exports.Server
         winston.verbose('Sending image to client')
         @socket.emit('messages', @canvas.toDataURL())
 
-    # Process an MQTT message.
+    # Process an MQTT message. Either adds a tracked item to the list
+    # if it does not exist, or updates the item's position if it does.
+    #
+    # topic
+    #      specifies which BeagleBone published the position
+    # message
+    #        contains the position in the format x,y
     #
     processMessage: (topic, message) =>
-        # TODO: process topics to draw objects on the canvas
         winston.verbose("MQTT message from topic #{topic}: " + message.toString())
+
+        positionString = message.toString().split(",")
+        position = new Vector(positionString[0], positionString[1])
+
+        index = topic.split("/")[1]
+        trackedItem = @trackedItems[index]
+
+        if !trackedItem?
+            winston.info("New item #{index} being tracked")
+            @trackedItems[index] = new TrackedItem(index, position)
+            return
+
+        @trackedItems[index].updatePosition(position)
