@@ -24,7 +24,7 @@ sudo apt-get -y install build-essential nodejs
 sudo apt-get -y install bluetooth bluez libbluetooth-dev libudev-dev
 
 # Install Cairo dependencies
-sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev
+sudo apt-get -y install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev
 
 # Install global npm dependencies
 sudo npm install -g coffee-script mosca bunyan
