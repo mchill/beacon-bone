@@ -1,5 +1,6 @@
 Canvas = require('canvas')
 Vector = require('victor')
+Node = require('./Node.coffee').Node
 TrackedItem = require('./TrackedItem.coffee').TrackedItem
 
 # Represents the indoor environment. Used for both pathfinding
@@ -11,7 +12,52 @@ class exports.Map
     #
     constructor: ->
         @scale = 20
+        drawBackground()
+        constructGraph()
 
+    # Populates the graph with a collection of nodes defined by
+    # the regions in the environment that they represent. Connect
+    # the appropriate nodes with edges.
+    #
+    constructGraph: =>
+        @graph = [
+            new Node(new Vector(23, 9), new Vector(8, 7)),
+            new Node(new Vector(23, 1), new Vector(8, 8)),
+            new Node(new Vector(17, 1), new Vector(6, 3)),
+            new Node(new Vector(10, 1), new Vector(7, 3)),
+            new Node(new Vector(8, 1), new Vector(2, 3)),
+            new Node(new Vector(8, 4), new Vector(2, 7)),
+            new Node(new Vector(8, 11), new Vector(2, 5)),
+            new Node(new Vector(8, 16), new Vector(2, 3)),
+            new Node(new Vector(8, 19), new Vector(2, 3)),
+            new Node(new Vector(1, 11), new Vector(7, 5)),
+            new Node(new Vector(1, 17), new Vector(7, 2))
+        ]
+
+        @graph[0].addEdge(@graph[1], 1)
+        @graph[1].addEdge(@graph[0], 1)
+        @graph[1].addEdge(@graph[2], 1)
+        @graph[2].addEdge(@graph[1], 1)
+        @graph[2].addEdge(@graph[3], 1)
+        @graph[3].addEdge(@graph[2], 1)
+        @graph[3].addEdge(@graph[4], 1)
+        @graph[4].addEdge(@graph[3], 1)
+        @graph[4].addEdge(@graph[5], 1)
+        @graph[5].addEdge(@graph[4], 1)
+        @graph[5].addEdge(@graph[6], 1)
+        @graph[6].addEdge(@graph[5], 1)
+        @graph[6].addEdge(@graph[7], 1)
+        @graph[6].addEdge(@graph[9], 1)
+        @graph[7].addEdge(@graph[6], 1)
+        @graph[7].addEdge(@graph[8], 1)
+        @graph[7].addEdge(@graph[10], 1)
+        @graph[8].addEdge(@graph[7], 1)
+        @graph[9].addEdge(@graph[6], 1)
+        @graph[10].addEdge(@graph[7], 1)
+
+    # Draw the hallways and beacons on the background canvas.
+    #
+    drawBackground: =>
         @beacons = [
             new Vector(1, 14),
             new Vector(1, 18),

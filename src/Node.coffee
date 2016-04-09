@@ -6,16 +6,12 @@ class exports.Node
     # Instantiates a node with its represented region
     # and some pathfinding metadata.
     #
-    # x
-    #  the x coordinate of the upper-left corner of the region
-    # y
-    #  the y coordinate of the upper-left corner of the region
-    # width
-    #      the width of the region
-    # height
-    #       the height of the region
+    # position
+    #         the coordinates of the upper-left corner of the region
+    # dimensions
+    #           the width and height of the region
     #
-    constructor: (x, y, width, height) ->
+    constructor: (@position, @dimensions) ->
         @edges = {}
         @lastTraversed = null
         @csf = 0
