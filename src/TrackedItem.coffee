@@ -14,6 +14,11 @@ class exports.TrackedItem
     constructor: (@id, @position) ->
         @time = new Date().getTime()
 
+    # Returns the position of the item.
+    #
+    getPosition: =>
+        return @position
+
     # Updates the position of the tracked item with the newest published value.
     #
     # position

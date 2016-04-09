@@ -3,9 +3,9 @@ express = require('express')
 app = require('express')()
 server = require('http').createServer(app)
 io = require('socket.io')(server)
-Canvas = require('canvas')
 mqtt = require('mqtt')
 Vector = require('victor')
+Map = require('./Map.coffee').Map
 TrackedItem = require('./TrackedItem.coffee').TrackedItem
 
 # Streams a continuously updated image of the map of the indoor
@@ -14,19 +14,17 @@ TrackedItem = require('./TrackedItem.coffee').TrackedItem
 #
 class exports.Server
     # Instantiates a server to display the map to users over HTTP.
-    # Connects to the broker and prepares the canvas.
+    # Connects to the broker and prepares the map.
     #
     # brokerIP
     #         the IP address of the MQTT broker
     #
     constructor: (@brokerIP) ->
         @trackedItems = {}
+        @map = new Map()
 
         winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
         @client = mqtt.connect(@brokerIP)
-
-        @canvas = new Canvas(200, 200)
-        @context = @canvas.getContext('2d')
 
         app.get('/', (req, res) =>
             winston.verbose('Serving index.html to a client')
@@ -70,12 +68,8 @@ class exports.Server
     # Draws the map based on current data and sends it using the socket.
     #
     drawMap: =>
-        @context.clearRect(0, 0, @canvas.width, @canvas.height);
-
-        # TODO: draw map
-
         winston.verbose('Sending image to client')
-        @socket.emit('messages', @canvas.toDataURL())
+        @socket.emit('messages', @map.getCanvas(@trackedItems).toDataURL())
 
     # Process an MQTT message. Either adds a tracked item to the list
     # if it does not exist, or updates the item's position if it does.
