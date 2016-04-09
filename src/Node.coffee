@@ -6,15 +6,27 @@ class exports.Node
     # Instantiates a node with its represented region
     # and some pathfinding metadata.
     #
-    # position
-    #         the coordinates of the upper-left corner of the region
-    # dimensions
-    #           the width and height of the region
+    # region
+    #       the region represented by the node,
+    #           represented as ((p_x, p_y), (width, height))
+    # path
+    #     the line that an item can visually move through the region,
+    #         represented as ((p1_x, p1_y), (p2_x, p2_y))
     #
-    constructor: (@position, @dimensions) ->
+    constructor: (@region, @path) ->
         @edges = {}
         @lastTraversed = null
         @csf = 0
+
+    # Return the region represented by the node.
+    #
+    getRegion: =>
+        return @region
+
+    # Return the path that an item can visually travel in the region.
+    #
+    getPath: =>
+        return @path
 
     # Connect another node to this node.
     #

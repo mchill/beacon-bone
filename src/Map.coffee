@@ -12,8 +12,8 @@ class exports.Map
     #
     constructor: ->
         @scale = 20
-        drawBackground()
-        constructGraph()
+        @constructGraph()
+        @drawBackground()
 
     # Populates the graph with a collection of nodes defined by
     # the regions in the environment that they represent. Connect
@@ -21,17 +21,30 @@ class exports.Map
     #
     constructGraph: =>
         @graph = [
-            new Node(new Vector(23, 9), new Vector(8, 7)),
-            new Node(new Vector(23, 1), new Vector(8, 8)),
-            new Node(new Vector(17, 1), new Vector(6, 3)),
-            new Node(new Vector(10, 1), new Vector(7, 3)),
-            new Node(new Vector(8, 1), new Vector(2, 3)),
-            new Node(new Vector(8, 4), new Vector(2, 7)),
-            new Node(new Vector(8, 11), new Vector(2, 5)),
-            new Node(new Vector(8, 16), new Vector(2, 3)),
-            new Node(new Vector(8, 19), new Vector(2, 3)),
-            new Node(new Vector(1, 11), new Vector(7, 5)),
-            new Node(new Vector(1, 17), new Vector(7, 2))
+            new Node(new Vector(new Vector(23, 9), new Vector(8, 7)),
+                new Vector(new Vector(27, 9), new Vector(27, 16))),
+            new Node(new Vector(new Vector(23, 1), new Vector(8, 3)),
+                new Vector(new Vector(27, 4), new Vector(27, 9))),
+            new Node(new Vector(new Vector(23, 4), new Vector(8, 5)),
+                new Vector(new Vector(23, 2.5), new Vector(27, 4))),
+            new Node(new Vector(new Vector(16, 1), new Vector(7, 3)),
+                new Vector(new Vector(16, 2.5), new Vector(23, 2.5))),
+            new Node(new Vector(new Vector(10, 1), new Vector(6, 3)),
+                new Vector(new Vector(10, 2.5), new Vector(16, 2.5))),
+            new Node(new Vector(new Vector(8, 1), new Vector(2, 3)),
+                new Vector(new Vector(9, 4), new Vector(10, 2.5))),
+            new Node(new Vector(new Vector(8, 4), new Vector(2, 7)),
+                new Vector(new Vector(9, 11), new Vector(9, 4))),
+            new Node(new Vector(new Vector(8, 11), new Vector(2, 5)),
+                new Vector(new Vector(9, 16), new Vector(9, 11))),
+            new Node(new Vector(new Vector(8, 16), new Vector(2, 3)),
+                new Vector(new Vector(9, 19), new Vector(9, 16))),
+            new Node(new Vector(new Vector(8, 19), new Vector(2, 3)),
+                new Vector(new Vector(9, 22), new Vector(9, 19))),
+            new Node(new Vector(new Vector(1, 11), new Vector(7, 5)),
+                new Vector(new Vector(1, 13.5), new Vector(8, 13.5))),
+            new Node(new Vector(new Vector(1, 17), new Vector(7, 2)),
+                new Vector(new Vector(1, 18), new Vector(8, 18)))
         ]
 
         @graph[0].addEdge(@graph[1], 1)
@@ -47,13 +60,15 @@ class exports.Map
         @graph[5].addEdge(@graph[6], 1)
         @graph[6].addEdge(@graph[5], 1)
         @graph[6].addEdge(@graph[7], 1)
-        @graph[6].addEdge(@graph[9], 1)
         @graph[7].addEdge(@graph[6], 1)
         @graph[7].addEdge(@graph[8], 1)
         @graph[7].addEdge(@graph[10], 1)
         @graph[8].addEdge(@graph[7], 1)
-        @graph[9].addEdge(@graph[6], 1)
+        @graph[8].addEdge(@graph[9], 1)
+        @graph[8].addEdge(@graph[11], 1)
+        @graph[9].addEdge(@graph[8], 1)
         @graph[10].addEdge(@graph[7], 1)
+        @graph[11].addEdge(@graph[8], 1)
 
     # Draw the hallways and beacons on the background canvas.
     #
@@ -87,7 +102,7 @@ class exports.Map
         context.fillStyle = "#00FFFF"
         for beacon in @beacons
             context.beginPath()
-            context.arc(beacon.x * @scale, beacon.y * @scale, @scale / 2, 0, 2 * Math.PI);
+            context.arc(beacon.x * @scale, beacon.y * @scale, @scale / 2, 0, 2 * Math.PI)
             context.fill()
             context.closePath()
 
@@ -106,7 +121,7 @@ class exports.Map
             position = trackedItem.getPosition()
 
             context.beginPath()
-            context.arc(position.x * @scale, position.y * @scale, @scale / 2, 0, 2 * Math.PI);
+            context.arc(position.x * @scale, position.y * @scale, @scale / 2, 0, 2 * Math.PI)
             context.fill()
             context.closePath()
 
