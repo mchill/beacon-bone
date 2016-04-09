@@ -44,7 +44,7 @@ class exports.Beacon
     #     the time when the beacon was discovered
     #
     addDistance: (rssi, time) =>
-        distance = 0.7 * Math.pow(rssi * 1.0 / @measuredPower, 6) + 0.3
+        distance = 0.24 * Math.pow(rssi * 1.0 / @measuredPower, 13.9) + 0.76
         @distances[time] = distance
         winston.verbose("Distance #{distance} added to beacon #{@id}")
 

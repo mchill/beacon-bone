@@ -1,6 +1,7 @@
 # BeaconBone
 
 [Developer Documentation](docs/documentation.md)
+[Self Study](docs/selfstudy.md)
 
 ## Install
 

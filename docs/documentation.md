@@ -21,6 +21,33 @@ Key:
     - x = rssi, always negative
     - a,b,c = constants, always positive
 
+### Data
+
+Beacon  |1 meter | 2 meters | 3 meters
+------- |------- | -------- | --------
+1       | -61    | -69      | -72
+2       | -61    | -68      | -71
+3       | -61    | -69      | -71
+4       | -61    | -69      | -71
+5       | -61    | -71      | -73
+6       | -61    | -68      | -71
+7       | -61    | -68      | -73
+8       | -61    | -68      | -72
+9       | -61    | -69      | -72
+10      | -61    | -69      | -72
+------- | ------ | -------- | --------
+Average | -61    | -68.8    | -71.8
+
+### Results
+
+`y(x1) = 1`, `x1 = -61`
+`y(x2) = 2`, `x2 = -68.8`
+`y(x3) = 3`, `x3 = -71.8`
+
+`a = 0.24`, `b = 13.9`, `c = 0.76`
+
+`y(x) = 0.24 * (-x / 61)^13.9 + 0.76`
+
 ## Distance Calculation
 
 1. For each message received from a beacon, plug the rssi into the formula above
