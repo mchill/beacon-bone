@@ -19,6 +19,21 @@ class exports.TrackedItem
     getPosition: =>
         return @position
 
+    # Returns true if this item is the one that the client is tracking.
+    #
+    isClient: =>
+        return @client?
+
+    # Returns true if this item is the one that the client is finding.
+    #
+    isTarget: =>
+        return @target?
+
+    # Return the time at which the position was last updated
+    #
+    lastPublished: =>
+        return @time
+
     # Updates the position of the tracked item with the newest published value.
     #
     # position
@@ -28,7 +43,12 @@ class exports.TrackedItem
         @position = position
         @time = new Date().getTime()
 
-    # Return the time at which the position was last updated
+    # Define this item as the one that the client is tracking.
     #
-    lastPublished: =>
-        return @time
+    setClient: =>
+        @client = true
+
+    # Define this item as the one that the client is finding.
+    #
+    setTarget: =>
+        @target = true

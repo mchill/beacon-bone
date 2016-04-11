@@ -23,10 +23,21 @@ class exports.Server
         @trackedItems = {}
         @map = new Map()
 
+        itemMap = {
+            "1": "54:4a:16:e6:90:09",
+            "2": "",
+            "3": "78:a5:04:c8:a0:e4",
+            "4": "f0:1f:af:1f:3c:18"
+        }
+
         winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
         @client = mqtt.connect(@brokerIP)
 
         app.get('/', (req, res) =>
+            @trackedItems = {}
+            @clientId = itemMap[req.query.client]
+            @targetId = itemMap[req.query.target]
+
             winston.verbose('Serving index.html to a client')
             res.sendFile('public/index.html', {'root': "#{__dirname}/../"})
         )
@@ -91,6 +102,12 @@ class exports.Server
         if !trackedItem?
             winston.info("New item #{index} being tracked")
             @trackedItems[index] = new TrackedItem(index, position)
+
+            if index == @clientId
+                @trackedItems[index].setClient()
+            else if index == @targetId
+                @trackedItems[index].setTarget()
+
             return
 
         @trackedItems[index].updatePosition(position)

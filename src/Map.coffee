@@ -116,8 +116,14 @@ class exports.Map
         context = foreground.getContext('2d')
         context.drawImage(@background, 0, 0)
 
-        context.fillStyle = "#FF0000"
         for index, trackedItem of trackedItems
+            context.fillStyle = "#0000FF"
+
+            if trackedItem.isClient()
+                context.fillStyle = "#00FF00"
+            else if trackedItem.isTarget()
+                context.fillStyle = "#FF0000"
+
             position = trackedItem.getPosition()
 
             context.beginPath()
