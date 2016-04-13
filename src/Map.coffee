@@ -47,26 +47,26 @@ class exports.Map
                 new Vector(new Vector(1, 18), new Vector(8, 18)))
         ]
 
-        @graph[0].addEdge(@graph[1], 1)
-        @graph[1].addEdge(@graph[0], 1)
-        @graph[1].addEdge(@graph[2], 1)
-        @graph[2].addEdge(@graph[1], 1)
-        @graph[2].addEdge(@graph[3], 1)
-        @graph[3].addEdge(@graph[2], 1)
-        @graph[3].addEdge(@graph[4], 1)
-        @graph[4].addEdge(@graph[3], 1)
-        @graph[4].addEdge(@graph[5], 1)
-        @graph[5].addEdge(@graph[4], 1)
-        @graph[5].addEdge(@graph[6], 1)
-        @graph[6].addEdge(@graph[5], 1)
-        @graph[6].addEdge(@graph[7], 1)
-        @graph[7].addEdge(@graph[6], 1)
-        @graph[7].addEdge(@graph[8], 1)
+        @graph[0].addEdge(@graph[1], 6)
+        @graph[1].addEdge(@graph[0], 6)
+        @graph[1].addEdge(@graph[2], 4)
+        @graph[2].addEdge(@graph[1], 4)
+        @graph[2].addEdge(@graph[3], 3)
+        @graph[3].addEdge(@graph[2], 3)
+        @graph[3].addEdge(@graph[4], 4)
+        @graph[4].addEdge(@graph[3], 4)
+        @graph[4].addEdge(@graph[5], 4)
+        @graph[5].addEdge(@graph[4], 4)
+        @graph[5].addEdge(@graph[6], 5)
+        @graph[6].addEdge(@graph[5], 5)
+        @graph[6].addEdge(@graph[7], 5)
+        @graph[7].addEdge(@graph[6], 5)
+        @graph[7].addEdge(@graph[8], 3)
         @graph[7].addEdge(@graph[10], 1)
-        @graph[8].addEdge(@graph[7], 1)
-        @graph[8].addEdge(@graph[9], 1)
+        @graph[8].addEdge(@graph[7], 3)
+        @graph[8].addEdge(@graph[9], 3)
         @graph[8].addEdge(@graph[11], 1)
-        @graph[9].addEdge(@graph[8], 1)
+        @graph[9].addEdge(@graph[8], 3)
         @graph[10].addEdge(@graph[7], 1)
         @graph[11].addEdge(@graph[8], 1)
 
@@ -141,19 +141,21 @@ class exports.Map
     # destTrackedItem
     #                The target item where pathfinding will end
     findPath: (srcTrackedItem, destTrackedItem) =>
-        idx = 0
+        fPidx = 0
+        kidx = 0
         foundPath = {}
         known = {}
 
-        for index, Node of graph
-            if Node.atNode(srcTrackedItem.getPosition().x, srcTrackedItem.getPosition().y)
-                known[idx] = Node
-                foundPath[idx] = Node
+        for index, node of graph
+            if node.atNode(srcTrackedItem.getPosition().x, srcTrackedItem.getPosition().y)
+                known[kidx++] = node
+                foundPath[fPidx++] = node
 
-        while idx < 11
-            for index, Node of known[idx].getEdges()
-                Node.setLastTraversed(known[idx])
-                Node.setCSF(Node.getLastTraversed.getCSF()
+        while fPidx < 11
+            for index, node of known[idx].getEdges()
+                node.setLastTraversed(known[idx])
+                node.setCSF(node.getLastTraversed.getCSF())
+                known[kidx++] = node
 
-            if foundPath[idx-1].atNode(destTrackedItem.getPosition().x, destTrackedItem.getPosition().y)
+            if foundPath[fPidx-1].atNode(destTrackedItem.getPosition().x, destTrackedItem.getPosition().y)
                 return foundPath

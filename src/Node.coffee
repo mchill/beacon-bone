@@ -77,6 +77,7 @@ class exports.Node
 
     #
     nextCandidate: () =>
+        return null
 
     # Find if a position is inside of this node's region
     #
