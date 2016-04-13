@@ -89,17 +89,17 @@ class exports.Map
         @background = new Canvas(32 * @scale, 23 * @scale)
         context = @background.getContext('2d')
 
-        context.fillStyle = "#000000"
+        context.fillStyle = '#000000'
         context.fillRect(0, 0, @background.width, @background.height)
 
-        context.fillStyle = "#FFFFFF"
+        context.fillStyle = '#FFFFFF'
         context.fillRect(1 * @scale, 11 * @scale, 7 * @scale, 5 * @scale)
         context.fillRect(1 * @scale, 17 * @scale, 7 * @scale, 2 * @scale)
         context.fillRect(8 * @scale, 1 * @scale, 2 * @scale, 21 * @scale)
         context.fillRect(10 * @scale, 1 * @scale, 13 * @scale, 3 * @scale)
         context.fillRect(23 * @scale, 1 * @scale, 8 * @scale, 15 * @scale)
 
-        context.fillStyle = "#00FFFF"
+        context.fillStyle = '#00FFFF'
         for beacon in @beacons
             context.beginPath()
             context.arc(beacon.x * @scale, beacon.y * @scale, @scale / 2, 0, 2 * Math.PI)
@@ -117,22 +117,28 @@ class exports.Map
         context.drawImage(@background, 0, 0)
 
         for index, trackedItem of trackedItems
-            context.fillStyle = "#0000FF"
+            context.fillStyle = '#0000FF'
 
             if trackedItem.isClient()
-                context.fillStyle = "#00FF00"
+                context.fillStyle = '#00FF00'
             else if trackedItem.isTarget()
-                context.fillStyle = "#FF0000"
+                context.fillStyle = '#FF0000'
 
             position = trackedItem.getPosition()
             for node in @graph
-                if node.isInRegion(p)
+                if node.isInRegion(position)
                     path = node.getPath()
                     position = @getClosestPoint(path.x, path.y, position)
+
+                    if trackedItem.isClient()
+                        region = node.getRegion()
+                        context.strokeStyle = '#00FF00'
+                        context.strokeRect(region.x.x * @scale, region.x.y * @scale, region.y.x * @scale, region.y.y * @scale)
+
                     break
 
             context.beginPath()
-            context.arc(p.x * @scale, p.y * @scale, @scale / 2, 0, 2 * Math.PI)
+            context.arc(position.x * @scale, position.y * @scale, @scale / 2, 0, 2 * Math.PI)
             context.fill()
             context.closePath()
 
