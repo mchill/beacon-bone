@@ -11,13 +11,17 @@ class exports.TrackedItem
     # position
     #         a vector representing the position of the item in the environment
     #
-    constructor: (@id, @position) ->
-        @time = new Date().getTime()
+    constructor: (@id, position, @graph) ->
+        @updatePosition(position)
 
     # Returns the position of the item.
     #
     getPosition: =>
         return @position
+
+    # Returns the node representing the region that the tracked item is in.
+    getNode: =>
+        return @node
 
     # Returns true if this item is the one that the client is tracking.
     #
@@ -41,6 +45,10 @@ class exports.TrackedItem
     #
     updatePosition: (position) =>
         @position = position
+        for node in @graph
+            if node.isInRegion(position)
+                @node = node
+
         @time = new Date().getTime()
 
     # Define this item as the one that the client is tracking.

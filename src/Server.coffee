@@ -101,7 +101,7 @@ class exports.Server
 
         if !trackedItem?
             winston.info("New item #{index} being tracked")
-            @trackedItems[index] = new TrackedItem(index, position)
+            @trackedItems[index] = new TrackedItem(index, position, @map.getGraph())
 
             if index == @clientId
                 @trackedItems[index].setClient()

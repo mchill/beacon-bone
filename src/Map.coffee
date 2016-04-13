@@ -15,6 +15,11 @@ class exports.Map
         @constructGraph()
         @drawBackground()
 
+    # Return the list of nodes in the map's graph.
+    #
+    getGraph: =>
+        return @graph
+
     # Populates the graph with a collection of nodes defined by
     # the regions in the environment that they represent. Connect
     # the appropriate nodes with edges.
@@ -125,17 +130,15 @@ class exports.Map
                 context.fillStyle = '#FF0000'
 
             position = trackedItem.getPosition()
-            for node in @graph
-                if node.isInRegion(position)
-                    path = node.getPath()
-                    position = @getClosestPoint(path.x, path.y, position)
+            node = trackedItem.getNode()
 
-                    if trackedItem.isClient()
-                        region = node.getRegion()
-                        context.strokeStyle = '#00FF00'
-                        context.strokeRect(region.x.x * @scale, region.x.y * @scale, region.y.x * @scale, region.y.y * @scale)
+            path = node.getPath()
+            position = @getClosestPoint(path.x, path.y, position)
 
-                    break
+            if trackedItem.isClient()
+                region = node.getRegion()
+                context.strokeStyle = '#00FF00'
+                context.strokeRect(region.x.x * @scale, region.x.y * @scale, region.y.x * @scale, region.y.y * @scale)
 
             context.beginPath()
             context.arc(position.x * @scale, position.y * @scale, @scale / 2, 0, 2 * Math.PI)
@@ -181,7 +184,7 @@ class exports.Map
         foundPath = {}
         known = {}
 
-        for index, node of graph
+        for node in graph
             if node.isInRegion(srcTrackedItem.getPosition())
                 known[kidx++] = node
                 foundPath[fPidx++] = node
