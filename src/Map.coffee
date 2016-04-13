@@ -132,3 +132,28 @@ class exports.Map
             context.closePath()
 
         return foreground
+
+    # Implements Dijkstra's Algorithm to determine the shortest path to a destination
+    #
+    # srcTrackedItem
+    #               The client item where pathfinding will begin
+    #
+    # destTrackedItem
+    #                The target item where pathfinding will end
+    findPath: (srcTrackedItem, destTrackedItem) =>
+        idx = 0
+        foundPath = {}
+        known = {}
+
+        for index, Node of graph
+            if Node.atNode(srcTrackedItem.getPosition().x, srcTrackedItem.getPosition().y)
+                known[idx] = Node
+                foundPath[idx] = Node
+
+        while idx < 11
+            for index, Node of known[idx].getEdges()
+                Node.setLastTraversed(known[idx])
+                Node.setCSF(Node.getLastTraversed.getCSF()
+
+            if foundPath[idx-1].atNode(destTrackedItem.getPosition().x, destTrackedItem.getPosition().y)
+                return foundPath
