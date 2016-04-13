@@ -1,5 +1,6 @@
 Canvas = require('canvas')
 Vector = require('victor')
+winston = require('winston')
 Node = require('./Node.coffee').Node
 TrackedItem = require('./TrackedItem.coffee').TrackedItem
 
@@ -179,21 +180,20 @@ class exports.Map
     # destTrackedItem
     #                The target item where pathfinding will end
     findPath: (srcTrackedItem, destTrackedItem) =>
-        fPidx = 0
-        kidx = 0
-        foundPath = {}
-        known = {}
+        
+        srcNode = srcTrackedItem.getNode()
+        closed = []
+        open = []
 
-        for node in graph
-            if node.isInRegion(srcTrackedItem.getPosition())
-                known[kidx++] = node
-                foundPath[fPidx++] = node
+        closed.push srcNode
 
-        while fPidx < 11
-            for index, node of known[idx].getEdges()
-                node.setLastTraversed(known[idx])
-                node.setCSF(node.getLastTraversed.getCSF())
-                known[kidx++] = node
+        while open.length() > 0
+            for index, node of open[open.length()-1].getEdges()
+                node.setLastTraversed(open[open.length()-1])
+                node.setCSF(node.getLastTraversed.getCSF() + index)
+                open.push node
 
-            if foundPath[fPidx-1].isInRegion(destTrackedItem.getPosition())
-                return foundPath
+
+
+            if closed[closed.length()-1].isInRegion(destTrackedItem.getPosition())
+                return closed
