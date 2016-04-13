@@ -28,6 +28,15 @@ class exports.Node
     getPath: =>
         return @path
 
+    isInRegion: (position) =>
+        upperLeft = @region.x
+        lowerRight = @region.x.clone().add(@region.y)
+
+        if position.x >= upperLeft.x and position.x <= lowerRight.x and position.y >= upperLeft.y and position.y <= lowerRight.y
+            return true
+
+        return false
+
     # Connect another node to this node.
     #
     # node

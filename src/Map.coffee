@@ -23,9 +23,9 @@ class exports.Map
         @graph = [
             new Node(new Vector(new Vector(23, 9), new Vector(8, 7)),
                 new Vector(new Vector(27, 9), new Vector(27, 16))),
-            new Node(new Vector(new Vector(23, 1), new Vector(8, 3)),
-                new Vector(new Vector(27, 4), new Vector(27, 9))),
             new Node(new Vector(new Vector(23, 4), new Vector(8, 5)),
+                new Vector(new Vector(27, 4), new Vector(27, 9))),
+            new Node(new Vector(new Vector(23, 1), new Vector(8, 3)),
                 new Vector(new Vector(23, 2.5), new Vector(27, 4))),
             new Node(new Vector(new Vector(16, 1), new Vector(7, 3)),
                 new Vector(new Vector(16, 2.5), new Vector(23, 2.5))),
@@ -125,10 +125,39 @@ class exports.Map
                 context.fillStyle = "#FF0000"
 
             position = trackedItem.getPosition()
+            for node in @graph
+                if node.isInRegion(p)
+                    path = node.getPath()
+                    position = @getClosestPoint(path.x, path.y, position)
+                    break
 
             context.beginPath()
-            context.arc(position.x * @scale, position.y * @scale, @scale / 2, 0, 2 * Math.PI)
+            context.arc(p.x * @scale, p.y * @scale, @scale / 2, 0, 2 * Math.PI)
             context.fill()
             context.closePath()
 
         return foreground
+
+    # Gets the closest point on a line segment from another point.
+    # Algorithm taken from: http://www.gamedev.net/topic/444154-closest-point-on-a-line/#entry3941160
+    #
+    # a
+    #  one endpoint of the line segment
+    # b
+    #  the other endpoint of the line segment
+    # p
+    #  the point to find the closest point to on the line segment
+    #
+    getClosestPoint: (a, b, p) =>
+        ap = p.clone().subtract(a)
+        ab = b.clone().subtract(a)
+
+        ab2 = ab.x * ab.x + ab.y * ab.y
+        ap_ab = ap.x * ab.x + ap.y * ab.y
+
+        t = ap_ab / ab2
+        t = Math.min(t, 1)
+        t = Math.max(t, 0)
+
+        p = a.clone().add(ab.multiply(new Vector(t, t)))
+        return p

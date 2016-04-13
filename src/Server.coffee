@@ -25,7 +25,7 @@ class exports.Server
 
         itemMap = {
             "1": "54:4a:16:e6:90:09",
-            "2": "",
+            "2": "6c:ec:eb:a4:c9:d8",
             "3": "78:a5:04:c8:a0:e4",
             "4": "f0:1f:af:1f:3c:18"
         }
