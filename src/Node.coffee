@@ -28,6 +28,11 @@ class exports.Node
     getPath: =>
         return @path
 
+    # Find if a position is inside of this node's region.
+    #
+    # position
+    #         the position of the tracked item
+    #
     isInRegion: (position) =>
         upperLeft = @region.x
         lowerRight = @region.x.clone().add(@region.y)
@@ -47,6 +52,11 @@ class exports.Node
     addEdge: (node, cost) =>
         @edges[cost] = node
 
+    # Returns the edges of this node.
+    #
+    getEdges: =>
+        return @edges
+
     # Set the last node traversed in the shortest path.
     #
     # lastTraversed
@@ -55,6 +65,13 @@ class exports.Node
     setLastTraversed: (lastTraversed) =>
         @lastTraversed = lastTraversed
 
+    # Returns the last node traversed in the shortest path.
+    #
+    getLastTraversed: =>
+        return @lastTraversed
+
+    getCost: (node) =>
+
     # Set the cost so far in the shortest path.
     #
     # csf
@@ -62,3 +79,16 @@ class exports.Node
     #
     setCSF: (csf) =>
         @csf = csf
+
+    # Returns the cost so far in the shortest path.
+    #
+    getCSF: =>
+        return @csf
+
+    #
+    leastExpensiveNeighbor: () =>
+        return @edges[0]
+
+    #
+    nextCandidate: () =>
+        return null
