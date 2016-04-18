@@ -126,8 +126,10 @@ class exports.Map
 
             if trackedItem.isClient()
                 context.fillStyle = '#00FF00'
+                client = trackedItem
             else if trackedItem.isTarget()
                 context.fillStyle = '#FF0000'
+                target = trackedItem
 
             position = trackedItem.getPosition()
             node = trackedItem.getNode()
@@ -144,6 +146,60 @@ class exports.Map
             context.arc(position.x * @scale, position.y * @scale, @scale / 2, 0, 2 * Math.PI)
             context.fill()
             context.closePath()
+
+        if client? and target?
+            context.strokeStyle = '#FF00FF'
+            path = findPath(client, target)
+
+            length = path.length
+            first = path[0].getPath()
+            second = path[1].getPath()
+            last = path[length-1].getPath()
+            secondToLast = path[length-2].getPath()
+
+            if first.x.x == second.x.x and first.x.y == second.x.y
+                firstPoint = first.x
+            else if first.x.x == second.y.x and first.x.y == second.y.y
+                firstPoint = first.x
+            else if first.y.x == second.x.x and first.y.y == second.x.y
+                firstPoint = first.y
+            else if first.y.x == second.y.x and first.y.y == second.y.y
+                firstPoint = first.y
+
+            context.beginPath()
+            context.moveTo(client.getPosition().x * @scale, client.getPosition().y * @scale)
+            context.lineTo(firstPoint.x * @scale, firstPoint.y * @scale)
+            context.stroke()
+            context.closePath()
+
+            if last.x.x == secondToLast.x.x and last.x.y == secondToLast.x.y
+                lastPoint = last.x
+            else if last.x.x == secondToLast.y.x and last.x.y == secondToLast.y.y
+                lastPoint = last.x
+            else if last.y.x == secondToLast.x.x and last.y.y == secondToLast.x.y
+                lastPoint = last.y
+            else if last.y.x == secondToLast.y.x and last.y.y == secondToLast.y.y
+                lastPoint = last.y
+
+            context.beginPath()
+            context.moveTo(target.getPosition().x * @scale, target.getPosition().y * @scale)
+            context.lineTo(lastPoint.x * @scale, lastPoint.y * @scale)
+            context.stroke()
+            context.closePath()
+
+            path.shift()
+            path.pop()
+
+            for node in path
+                nodePath = node.getPath()
+                p1 = nodePath.x
+                p2 = nodePath.y
+
+                context.beginPath()
+                context.moveTo(p1.x * @scale, p1.y * @scale)
+                context.lineTo(p2.x * @scale, p2.y * @scale)
+                context.stroke()
+                context.closePath()
 
         return foreground
 
