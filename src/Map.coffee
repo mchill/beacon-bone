@@ -239,10 +239,9 @@ class exports.Map
     	minIndex = -1
 
     	for int, index in dist
-    		if (!closed[index] && dist[index] < min){
+    		if !closed[index] && dist[index] < min
     			min = dist[index]
     			minIndex = index
-    		}
 
     	return minIndex
 
@@ -277,27 +276,25 @@ class exports.Map
         		break
 
         	for node, idx in graph
-        		if(idx == u){
+        		if idx == u
         			edges = node.getEdges()
         			for edge, weight of edges
         				graphIdx = @graph.indexOf(edge)
-        				if(!closed[graphIdx]){
+        				if !closed[graphIdx]
         					edge.setCSF(node.getCSF()+weight)
         					dist[graphIdx] = edge.getCSF()
-        				}
-        		}
 
         	
-        	if(srcNodeIdx > destNodeIdx)
+        	if srcNodeIdx > destNodeIdx
         		for node, index in nodes
         			nodeIdx = @graph.indexOf(node)
-        			if( nodeIdx > srcNodeIdx || nodeIdx < destNodeIdx)
+        			if nodeIdx > srcNodeIdx || nodeIdx < destNodeIdx
         				nodes.splice(index, 1)
 
-        	if(srcNodeIdx < destNodeIdx)
+        	if srcNodeIdx < destNodeIdx
         		for node, index in nodes
         			nodeIdx = @graph.indexOf(node)
-        			if( nodeIdx < srcNodeIdx || nodeIdx > destNodeIdx)
+        			if nodeIdx < srcNodeIdx || nodeIdx > destNodeIdx
         				nodes.splice(index, 1)
 
         	winston.verbose("Shortest path has been found.")
