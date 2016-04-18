@@ -1,5 +1,6 @@
 Canvas = require('canvas')
 Vector = require('victor')
+winston = require('winston')
 Node = require('./Node.coffee').Node
 TrackedItem = require('./TrackedItem.coffee').TrackedItem
 
@@ -60,18 +61,18 @@ class exports.Map
         @graph[3].addEdge(@graph[2], 3)
         @graph[3].addEdge(@graph[4], 4)
         @graph[4].addEdge(@graph[3], 4)
-        @graph[4].addEdge(@graph[5], 4)
-        @graph[5].addEdge(@graph[4], 4)
-        @graph[5].addEdge(@graph[6], 5)
-        @graph[6].addEdge(@graph[5], 5)
+        @graph[4].addEdge(@graph[5], 3)
+        @graph[5].addEdge(@graph[4], 3)
+        @graph[5].addEdge(@graph[6], 4)
+        @graph[6].addEdge(@graph[5], 4)
         @graph[6].addEdge(@graph[7], 5)
         @graph[7].addEdge(@graph[6], 5)
         @graph[7].addEdge(@graph[8], 3)
         @graph[7].addEdge(@graph[10], 1)
         @graph[8].addEdge(@graph[7], 3)
-        @graph[8].addEdge(@graph[9], 3)
+        @graph[8].addEdge(@graph[9], 2)
         @graph[8].addEdge(@graph[11], 1)
-        @graph[9].addEdge(@graph[8], 3)
+        @graph[9].addEdge(@graph[8], 2)
         @graph[10].addEdge(@graph[7], 1)
         @graph[11].addEdge(@graph[8], 1)
 
@@ -227,6 +228,24 @@ class exports.Map
         p = a.clone().add(ab.multiply(new Vector(t, t)))
         return p
 
+    # Utility function to aid in finding the least expensive node for Dijkstra's Algorithm
+    #
+    # dist
+    #	  Array holding the cost of each node from the source node
+    # closed
+    #		An Array of Booleans representing if a node is part of the final path or not
+    getMinDistance: (dist, closed) =>
+    	min = 100
+    	minIndex = -1
+
+    	for int, index in dist
+    		if (!closed[index] && dist[index] < min){
+    			min = dist[index]
+    			minIndex = index
+    		}
+
+    	return minIndex
+
     # Implements Dijkstra's Algorithm to determine the shortest path to a destination
     #
     # srcTrackedItem
@@ -235,21 +254,52 @@ class exports.Map
     # destTrackedItem
     #                The target item where pathfinding will end
     findPath: (srcTrackedItem, destTrackedItem) =>
-        fPidx = 0
-        kidx = 0
-        foundPath = {}
-        known = {}
+        
+        srcNode = srcTrackedItem.getNode()
+        srcNodeIdx = @graph.indexOf(srcNode)
+        destNode = destTrackedItem.getNode()
+        destNodeIdx = @graph.indexOf(destNode)
+        nodes = []
+        [0..11].closed -> false
+        [0..11].dist -> 100
 
-        for node in graph
-            if node.isInRegion(srcTrackedItem.getPosition())
-                known[kidx++] = node
-                foundPath[fPidx++] = node
+        dist[srcNodeIdx] = 0
+        srcNode.setCSF(0)
 
-        while fPidx < 11
-            for index, node of known[idx].getEdges()
-                node.setLastTraversed(known[idx])
-                node.setCSF(node.getLastTraversed.getCSF())
-                known[kidx++] = node
+        for int in dist
 
-            if foundPath[fPidx-1].isInRegion(destTrackedItem.getPosition())
-                return foundPath
+        	u = getMinDistance(dist, closed)
+
+        	closed[u] = true
+        	nodes.push @graph[u]
+
+        	if(@graph[u] == destNode)
+        		break
+
+        	for node, idx in graph
+        		if(idx == u){
+        			edges = node.getEdges()
+        			for edge, weight of edges
+        				graphIdx = @graph.indexOf(edge)
+        				if(!closed[graphIdx]){
+        					edge.setCSF(node.getCSF()+weight)
+        					dist[graphIdx] = edge.getCSF()
+        				}
+        		}
+
+        	
+        	if(srcNodeIdx > destNodeIdx)
+        		for node, index in nodes
+        			nodeIdx = @graph.indexOf(node)
+        			if( nodeIdx > srcNodeIdx || nodeIdx < destNodeIdx)
+        				nodes.splice(index, 1)
+
+        	if(srcNodeIdx < destNodeIdx)
+        		for node, index in nodes
+        			nodeIdx = @graph.indexOf(node)
+        			if( nodeIdx < srcNodeIdx || nodeIdx > destNodeIdx)
+        				nodes.splice(index, 1)
+
+        	winston.verbose("Shortest path has been found.")
+
+        return nodes

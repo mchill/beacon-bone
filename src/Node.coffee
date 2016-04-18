@@ -84,11 +84,3 @@ class exports.Node
     #
     getCSF: =>
         return @csf
-
-    #
-    leastExpensiveNeighbor: () =>
-        return @edges[0]
-
-    #
-    nextCandidate: () =>
-        return null
