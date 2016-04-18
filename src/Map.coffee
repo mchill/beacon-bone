@@ -244,4 +244,6 @@ class exports.Map
         			if( nodeIdx < srcNodeIdx || nodeIdx > destNodeIdx)
         				nodes.splice(index, 1)
 
+        	winston.verbose("Shortest path has been found.")
+
         return nodes
