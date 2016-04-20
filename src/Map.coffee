@@ -153,6 +153,9 @@ class exports.Map
             path = findPath(client, target)
 
             length = path.length
+            if length > 2
+                return foreground
+
             first = path[0].getPath()
             second = path[1].getPath()
             last = path[length-1].getPath()
