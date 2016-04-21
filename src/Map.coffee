@@ -116,8 +116,12 @@ class exports.Map
     #
     # trackedItems
     #             a list of items that are currently publishing position to the broker
+    # clientId
+    #         the MAC address of the client
+    # targetId
+    #         the MAC address of the target
     #
-    getCanvas: (trackedItems) =>
+    getCanvas: (trackedItems, clientId, targetId) =>
         foreground = new Canvas(32 * @scale, 23 * @scale)
         context = foreground.getContext('2d')
         context.drawImage(@background, 0, 0)
@@ -125,20 +129,23 @@ class exports.Map
         for index, trackedItem of trackedItems
             context.fillStyle = '#0000FF'
 
-            if trackedItem.isClient()
+            id = trackedItem.getId()
+            if id == clientId
                 context.fillStyle = '#00FF00'
                 client = trackedItem
-            else if trackedItem.isTarget()
+            else if id == targetId
                 context.fillStyle = '#FF0000'
                 target = trackedItem
 
             position = trackedItem.getPosition()
             node = trackedItem.getNode()
+            if !node?
+                continue
 
             path = node.getPath()
             position = @getClosestPoint(path.x, path.y, position)
 
-            if trackedItem.isClient()
+            if id == clientId
                 region = node.getRegion()
                 context.strokeStyle = '#00FF00'
                 context.strokeRect(region.x.x * @scale, region.x.y * @scale, region.y.x * @scale, region.y.y * @scale)
@@ -148,51 +155,25 @@ class exports.Map
             context.fill()
             context.closePath()
 
-        if client? and target?
+        if client?
+            clientNode = client.getNode()
+        else if clientId?
+            clientId = parseInt(clientId.substring(4, 6), 10)
+            clientNode = @graph[clientId]
+        if target?
+            targetNode = target.getNode()
+        else if targetId?
+            targetId = parseInt(targetId.substring(4, 6), 10)
+            targetNode = @graph[targetId]
+
+        if clientNode? and targetNode?
             context.strokeStyle = '#FF00FF'
-            path = findPath(client, target)
+
+            path = @findPath(clientNode, targetNode)
 
             length = path.length
-            if length > 2
+            if length < 2
                 return foreground
-
-            first = path[0].getPath()
-            second = path[1].getPath()
-            last = path[length-1].getPath()
-            secondToLast = path[length-2].getPath()
-
-            if first.x.x == second.x.x and first.x.y == second.x.y
-                firstPoint = first.x
-            else if first.x.x == second.y.x and first.x.y == second.y.y
-                firstPoint = first.x
-            else if first.y.x == second.x.x and first.y.y == second.x.y
-                firstPoint = first.y
-            else if first.y.x == second.y.x and first.y.y == second.y.y
-                firstPoint = first.y
-
-            context.beginPath()
-            context.moveTo(client.getPosition().x * @scale, client.getPosition().y * @scale)
-            context.lineTo(firstPoint.x * @scale, firstPoint.y * @scale)
-            context.stroke()
-            context.closePath()
-
-            if last.x.x == secondToLast.x.x and last.x.y == secondToLast.x.y
-                lastPoint = last.x
-            else if last.x.x == secondToLast.y.x and last.x.y == secondToLast.y.y
-                lastPoint = last.x
-            else if last.y.x == secondToLast.x.x and last.y.y == secondToLast.x.y
-                lastPoint = last.y
-            else if last.y.x == secondToLast.y.x and last.y.y == secondToLast.y.y
-                lastPoint = last.y
-
-            context.beginPath()
-            context.moveTo(target.getPosition().x * @scale, target.getPosition().y * @scale)
-            context.lineTo(lastPoint.x * @scale, lastPoint.y * @scale)
-            context.stroke()
-            context.closePath()
-
-            path.shift()
-            path.pop()
 
             for node in path
                 nodePath = node.getPath()
@@ -255,22 +236,19 @@ class exports.Map
     #
     # destTrackedItem
     #                The target item where pathfinding will end
-    findPath: (srcTrackedItem, destTrackedItem) =>
-        
-        srcNode = srcTrackedItem.getNode()
+    findPath: (srcNode, destNode) =>
         srcNodeIdx = @graph.indexOf(srcNode)
-        destNode = destTrackedItem.getNode()
         destNodeIdx = @graph.indexOf(destNode)
         nodes = []
-        [0..11].closed -> false
-        [0..11].dist -> 100
+        closed = [false, false, false, false, false, false, false, false, false, false]
+        dist = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
 
         dist[srcNodeIdx] = 0
         srcNode.setCSF(0)
 
         for int in dist
 
-        	u = getMinDistance(dist, closed)
+        	u = @getMinDistance(dist, closed)
 
         	closed[u] = true
         	nodes.push @graph[u]
@@ -278,16 +256,15 @@ class exports.Map
         	if(@graph[u] == destNode)
         		break
 
-        	for node, idx in graph
+        	for node, idx in @graph
         		if idx == u
         			edges = node.getEdges()
-        			for edge, weight of edges
+        			for weight, edge of edges
         				graphIdx = @graph.indexOf(edge)
         				if !closed[graphIdx]
         					edge.setCSF(node.getCSF()+weight)
         					dist[graphIdx] = edge.getCSF()
 
-        	
         	if srcNodeIdx > destNodeIdx
         		for node, index in nodes
         			nodeIdx = @graph.indexOf(node)

@@ -1,16 +1,13 @@
 winston = require('winston')
 express = require('express')
-app = require('express')()
-server = require('http').createServer(app)
-io = require('socket.io')(server)
 mqtt = require('mqtt')
 Vector = require('victor')
 Map = require('./Map.coffee').Map
 TrackedItem = require('./TrackedItem.coffee').TrackedItem
 
-# Streams a continuously updated image of the map of the indoor
-# environment and the publishing objects within it to clients
-# over and HTTP connection.
+# Keeps track of the indoor environment in a single place,
+# and lets clients use that one knowledge source to create
+# paths for different targets.
 #
 class exports.Server
     # Instantiates a server to display the map to users over HTTP.
@@ -18,38 +15,17 @@ class exports.Server
     #
     # brokerIP
     #         the IP address of the MQTT broker
+    # server
+    #       the express server
     #
-    constructor: (@brokerIP) ->
+    constructor: (@brokerIP, @server) ->
         @trackedItems = {}
         @map = new Map()
-
-        itemMap = {
-            "1": "54:4a:16:e6:90:09",
-            "2": "6c:ec:eb:a4:c9:d8",
-            "3": "78:a5:04:c8:a0:e4",
-            "4": "f0:1f:af:1f:3c:18"
-        }
 
         winston.verbose("Connecting to the MQTT broker at #{@brokerIP}")
         @client = mqtt.connect(@brokerIP)
 
-        app.get('/', (req, res) =>
-            @trackedItems = {}
-            @clientId = itemMap[req.query.client]
-            @targetId = itemMap[req.query.target]
-
-            winston.verbose('Serving index.html to a client')
-            res.sendFile('public/index.html', {'root': "#{__dirname}/../"})
-        )
-
-    # Start listening over port 80 on the HTTP server.
-    # Subscribe to all positions on the broker and declare what
-    # to do on MQTT messages. Set timing for redrawing the map.
-    #
-    start: =>
-        server.listen(80, =>
-            winston.info('HTTP server started')
-        )
+        @trackedItems = {}
 
         @client.on('connect', =>
             winston.info("Connected to the MQTT broker at #{@brokerIP}")
@@ -58,14 +34,8 @@ class exports.Server
 
         @client.on('message', @processMessage)
 
-        io.on('connection', (socket) =>
-            winston.info('Connected to a client over a socket')
-            @socket = socket
-            setInterval(@drawMap, 500)
-        )
-
         setInterval(@purgeTrackedItems, 500)
-
+        
     # Removed tracked items that have not published a position recently.
     #
     purgeTrackedItems: =>
@@ -78,9 +48,13 @@ class exports.Server
 
     # Draws the map based on current data and sends it using the socket.
     #
-    drawMap: =>
-        winston.verbose('Sending image to client')
-        @socket.emit('messages', @map.getCanvas(@trackedItems).toDataURL())
+    # clientId
+    #         the MAC address of the client
+    # targetId
+    #         the MAC address of the target
+    #
+    drawMap: (clientId, targetId) =>
+        return @map.getCanvas(@trackedItems, clientId, targetId).toDataURL()
 
     # Process an MQTT message. Either adds a tracked item to the list
     # if it does not exist, or updates the item's position if it does.
@@ -102,12 +76,6 @@ class exports.Server
         if !trackedItem?
             winston.info("New item #{index} being tracked")
             @trackedItems[index] = new TrackedItem(index, position, @map.getGraph())
-
-            if index == @clientId
-                @trackedItems[index].setClient()
-            else if index == @targetId
-                @trackedItems[index].setTarget()
-
             return
 
         @trackedItems[index].updatePosition(position)

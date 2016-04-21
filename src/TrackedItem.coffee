@@ -14,6 +14,11 @@ class exports.TrackedItem
     constructor: (@id, position, @graph) ->
         @updatePosition(position)
 
+    # Returns the MAC address of the item.
+    #
+    getId: =>
+        return @id
+
     # Returns the position of the item.
     #
     getPosition: =>
@@ -22,16 +27,6 @@ class exports.TrackedItem
     # Returns the node representing the region that the tracked item is in.
     getNode: =>
         return @node
-
-    # Returns true if this item is the one that the client is tracking.
-    #
-    isClient: =>
-        return @client?
-
-    # Returns true if this item is the one that the client is finding.
-    #
-    isTarget: =>
-        return @target?
 
     # Return the time at which the position was last updated
     #
@@ -50,13 +45,3 @@ class exports.TrackedItem
                 @node = node
 
         @time = new Date().getTime()
-
-    # Define this item as the one that the client is tracking.
-    #
-    setClient: =>
-        @client = true
-
-    # Define this item as the one that the client is finding.
-    #
-    setTarget: =>
-        @target = true
