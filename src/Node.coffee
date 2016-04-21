@@ -70,8 +70,6 @@ class exports.Node
     getLastTraversed: =>
         return @lastTraversed
 
-    getCost: (node) =>
-
     # Set the cost so far in the shortest path.
     #
     # csf

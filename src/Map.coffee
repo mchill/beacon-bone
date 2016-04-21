@@ -212,71 +212,67 @@ class exports.Map
         p = a.clone().add(ab.multiply(new Vector(t, t)))
         return p
 
-    # Utility function to aid in finding the least expensive node for Dijkstra's Algorithm
+    # Returns the node in the open list with the smallest cost so far.
     #
-    # dist
-    #	  Array holding the cost of each node from the source node
-    # closed
-    #		An Array of Booleans representing if a node is part of the final path or not
-    getMinDistance: (dist, closed) =>
-    	min = 100
-    	minIndex = -1
-
-    	for int, index in dist
-    		if !closed[index] && dist[index] < min
-    			min = dist[index]
-    			minIndex = index
-
-    	return minIndex
-
-    # Implements Dijkstra's Algorithm to determine the shortest path to a destination
+    # openList
+    #         the list of nodes to examine
     #
-    # srcTrackedItem
-    #               The client item where pathfinding will begin
+    getNextNode: (openList) =>
+        lowest = Number.MAX_VALUE
+        correspondingNode = null
+
+        for node in openList
+            value = node.getCSF()
+
+            if value < lowest
+                lowest = value
+                correspondingNode = node
+
+        return correspondingNode
+
+    # Implements Dijkstra's Algorithm to determine the shortest path to a destination.
     #
-    # destTrackedItem
-    #                The target item where pathfinding will end
-    findPath: (srcNode, destNode) =>
-        srcNodeIdx = @graph.indexOf(srcNode)
-        destNodeIdx = @graph.indexOf(destNode)
-        nodes = []
-        closed = [false, false, false, false, false, false, false, false, false, false]
-        dist = [100, 100, 100, 100, 100, 100, 100, 100, 100, 100]
+    # source
+    #       the node where pathfinding will begin
+    # target
+    #       the node where pathfinding will end
+    #
+    findPath: (source, target) =>
+        source.setCSF(0)
 
-        dist[srcNodeIdx] = 0
-        srcNode.setCSF(0)
+        openList = [source]
+        closedList = []
 
-        for int in dist
+        while openList.length > 0
+            nodeX = @getNextNode(openList)
 
-        	u = @getMinDistance(dist, closed)
+            for cost, nodeY of nodeX.getEdges()
+                newCSF = nodeX.getCSF() + cost
 
-        	closed[u] = true
-        	nodes.push @graph[u]
+                if nodeY in openList
+                    if newCSF < nodeY.getCSF()
+                        nodeY.setCSF(newCSF)
+                        nodeY.setLastTraversed(nodeX)
+                else if nodeY not in closedList
+                    nodeY.setCSF(newCSF)
+                    nodeY.setLastTraversed(nodeX)
+                    openList.push(nodeY)
 
-        	if(@graph[u] == destNode)
-        		break
+            i = openList.indexOf(nodeX)
+            openList.splice(i, 1)
+            closedList.push(nodeX)
 
-        	for node, idx in @graph
-        		if idx == u
-        			edges = node.getEdges()
-        			for weight, edge of edges
-        				graphIdx = @graph.indexOf(edge)
-        				if !closed[graphIdx]
-        					edge.setCSF(node.getCSF()+weight)
-        					dist[graphIdx] = edge.getCSF()
+            if target in closedList
+                break
 
-        	if srcNodeIdx > destNodeIdx
-        		for node, index in nodes
-        			nodeIdx = @graph.indexOf(node)
-        			if nodeIdx > srcNodeIdx || nodeIdx < destNodeIdx
-        				nodes.splice(index, 1)
+        path = []
+        next = target
 
-        	if srcNodeIdx < destNodeIdx
-        		for node, index in nodes
-        			nodeIdx = @graph.indexOf(node)
-        			if nodeIdx < srcNodeIdx || nodeIdx > destNodeIdx
-        				nodes.splice(index, 1)
+        while next != source
+            path.push(next)
+            next = next.getLastTraversed()
 
-        	winston.verbose("Shortest path has been found.")
+        path.push(source)
 
-        return nodes
+        winston.verbose("Shortest path found")
+        return path
