@@ -6,14 +6,6 @@ winston = require('winston')
 #
 class exports.Client
     constructor: (server, @myServer, client, target) ->
-        @io = require('socket.io')(server)
-
-        @io.on('connection', (socket) =>
-            winston.info('Connected to a client over a socket')
-            @socket = socket
-            setInterval(@drawMap, 500)
-        )
-
         itemMap = {
             "1": "54:4a:16:e6:90:09",
             "2": "6c:ec:eb:a4:c9:d8",
@@ -27,8 +19,21 @@ class exports.Client
         if !@clientId? then @clientId = client
         if !@targetId? then @targetId = target
 
+        setInterval(@drawMap, 500)
+
+    # Adds a socket for the server to send the client updated map images.
+    # Returns false if the socket is already set, and true if not.
+    #
+    # socket
+    #       the socket for this client
+    #
+    addSocket: (socket) =>
+        @socket = socket
+
     # Draws the map based on current data and sends it using the socket.
     #
     drawMap: =>
-        winston.verbose('Sending image to client')
-        @socket.emit('messages', @myServer.drawMap(@clientId, @targetId))
+        if @socket?
+            winston.verbose('Sending image to client')
+            console.log @socket.id
+            @socket.emit('messages', @myServer.drawMap(@clientId, @targetId))

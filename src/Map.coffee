@@ -158,12 +158,12 @@ class exports.Map
         if client?
             clientNode = client.getNode()
         else if clientId?
-            clientId = parseInt(clientId.substring(4, 6), 10)
+            clientId = parseInt(clientId.substring(4), 10)
             clientNode = @graph[clientId]
         if target?
             targetNode = target.getNode()
         else if targetId?
-            targetId = parseInt(targetId.substring(4, 6), 10)
+            targetId = parseInt(targetId.substring(4), 10)
             targetNode = @graph[targetId]
 
         if clientNode? and targetNode?
